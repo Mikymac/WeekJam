@@ -6,33 +6,49 @@ using UnityEngine.SceneManagement;
 [RequireComponent(typeof(Rigidbody))]
 public class Player : MonoBehaviour
 {
+    // the animator which holds the player animations.
     public Animator _animator;
     [Header("Movement Settings")]
+    // the movement speed of the player.
     public float speed;
-    public float jumpVelocity;
+    // the jump height of the player.
+    public float jumpHeight;
+    // the rotate speed of the player, used for lerping rotation.
     public float rotateSpeed;
+    // whether the player object is grounded.
+    public bool isGrounded;
+    // player's current movement
+    public float currentAcceleration;
     [Header("Camera Settings")]
+    // X camera sensitivity.
     public float lookX;
+    // Y camera sensitivity.
     public float lookY;
     [Space]
+    // the minimum Y rotation value of the camera.
     public float minY;
+    // the maximum Y rotation value of the camera.
     public float maxY;
 
+    // the angle at which the camera faces on the Y axis.
     private float cameraAngle;
 
+    // the last user input from the WASD buttons or the Left Analog Stick.
     Vector3 lastInput;
 
+    // private variables that store components this object needs.
+    // the player's rigidbody.
     Rigidbody _rigidbody;
+    // the player camera
     Camera _camera;
+    // the pivot for the camera, rotates only on the Y axis.
     Transform _pivot;
+    // the panning object for the camera, rotates only on the X axis.
     Transform _pan;
+    // the graphics, this is the player's Y rotation.
     Transform _graphics;
-    Vector3 _startPos;
 
-    public bool isGrounded;
-    float halfheight = 0.8F;
-    RaycastHit ray;
-    public Vector2 impulseForce;
+    // whether the player is currently jumping.
     bool isJumping = false;
 
     private void Awake()
@@ -47,7 +63,6 @@ public class Player : MonoBehaviour
         _graphics = transform.Find("Graphics");
 
         _camera = _pan.Find("Camera").GetComponent<Camera>();
-        _startPos = transform.position;
     }
 
     private void Update()
@@ -71,11 +86,11 @@ public class Player : MonoBehaviour
     {
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, Mathf.Sqrt(2F * 9.81F * jumpVelocity), _rigidbody.velocity.z);
+            _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, Mathf.Sqrt(2F * 9.81F * jumpHeight), _rigidbody.velocity.z);
             isJumping = true;
         }
 
-        if (_rigidbody.velocity.y < 0F) // COLONS ARE FULL OF SHIT
+        if (_rigidbody.velocity.y < 0F)
             _rigidbody.mass = 4;
         else
             _rigidbody.mass = 1;
@@ -91,20 +106,32 @@ public class Player : MonoBehaviour
         Vector3 lookInput = new Vector3(Input.GetAxis("LookX"), 0F, Input.GetAxis("LookY"));
 
         // moves the player using its rigidbody and input.
-        _rigidbody.MovePosition(transform.position + (_pivot.TransformDirection(input.normalized) * speed * (isJumping ? 2F : 1F) * Time.deltaTime));
+        _rigidbody.MovePosition(transform.position + (_pivot.TransformDirection(input.normalized) * speed * currentAcceleration * (isJumping ? 2F : 1F) * Time.deltaTime));
 
         // reset the pivot position.
         _pivot.transform.position = transform.position;
 
-        _animator.SetFloat("speed", input.magnitude);
+        _animator.SetFloat("speed", currentAcceleration);
 
         // turning
         if (input.magnitude != 0)
         {
             lastInput = input;
+
+            // increases the current acceleration.
+            currentAcceleration += Time.deltaTime;
+
             transform.eulerAngles = new Vector3(0F, _pivot.eulerAngles.y, 0F);
             _graphics.localRotation = Quaternion.Lerp(_graphics.localRotation, Quaternion.LookRotation(lastInput), Time.deltaTime * rotateSpeed);
         }
+        else
+        {
+            // decreases the current acceleration.
+            currentAcceleration -= Time.deltaTime * 2F;
+        }
+
+        // clamps the current acceleration.
+        currentAcceleration = Mathf.Clamp01(currentAcceleration);
 
         // camera & butt stuff
         cameraAngle += lookInput.x * lookX * Time.deltaTime;

@@ -26,6 +26,7 @@ ModelImporter:
     100040: Cube_002
     100042: Cube_003
     100044: Cube_004
+    100046: Plane
     400000: arm_L
     400002: arm_R
     400004: Armature
@@ -49,15 +50,19 @@ ModelImporter:
     400040: Cube_002
     400042: Cube_003
     400044: Cube_004
+    400046: Plane
     2100000: Material
     2100002: unnamed
     2300000: Cube_001
+    2300002: Plane
     3300000: Cube_001
+    3300002: Plane
     4300000: Cube
     4300002: Cube_001
     4300004: Cube_002
     4300006: Cube_004
     4300008: Cube_003
+    4300010: Plane
     7400000: Default Take
     7400002: idle
     7400004: Walk
