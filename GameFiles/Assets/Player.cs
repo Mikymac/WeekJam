@@ -15,10 +15,22 @@ public class Player : MonoBehaviour
     public float jumpHeight;
     // the rotate speed of the player, used for lerping rotation.
     public float rotateSpeed;
-    // whether the player object is grounded.
-    public bool isGrounded;
     // player's current movement
     public float currentAcceleration;
+    [Space]
+    // collision detection stuff
+    public Vector3 boxCastCenter;
+    public Vector3 boxCastDimensions;
+
+    public bool isGrounded
+    {
+        get
+        {
+            return Physics.BoxCastAll(boxCastCenter + transform.position, boxCastDimensions / 2F, Vector3.down, _graphics.rotation, 0.01F).Length != 0;
+        }
+    }
+
+
     [Header("Camera Settings")]
     // X camera sensitivity.
     public float lookX;
@@ -32,6 +44,19 @@ public class Player : MonoBehaviour
 
     // the angle at which the camera faces on the Y axis.
     private float cameraAngle;
+
+    [Header("Abilities")]
+    // whether the player can double jump.
+    public bool canDoubleJump;
+    // temp variable for handling double jumping.
+    private bool doubleJump;
+    [Space]
+    // whether the player can dash.
+    public bool canDash;
+    // temp variable for handling dashing.
+    public bool dash;
+    // cooldown on the dash
+    private float dashCooldown;
 
     // the last user input from the WASD buttons or the Left Analog Stick.
     Vector3 lastInput;
@@ -69,12 +94,24 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Z))
             _animator.SetTrigger("dab");
-    }
 
-    private void FixedUpdate()
-    {
         Move();
         Jump();
+        Dash();
+
+        // reduces the dashCooldown over time.
+        dashCooldown -= Time.deltaTime;
+
+        if (isGrounded)
+        {
+            // resets the double jump
+            if (!isJumping)
+                doubleJump = false;
+
+            // resets the dash.
+            if (dashCooldown < 0F)
+                dash = false;
+        }
 
         if (transform.position.y < -99f)
         {
@@ -82,20 +119,35 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void Dash()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftControl) && (canDash && !dash))
+        {
+            _rigidbody.AddForce((_graphics.forward * 3F + transform.up * 1.5F) * Time.deltaTime * 200F, ForceMode.VelocityChange);
+            dash = true;
+            dashCooldown = 1F;
+        }
+    }
+
     private void Jump()
     {
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        _animator.SetBool("isJumping", isJumping);
+
+        if (Input.GetButtonDown("Jump") && (isGrounded || (doubleJump && canDoubleJump)))
         {
             _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, Mathf.Sqrt(2F * 9.81F * jumpHeight), _rigidbody.velocity.z);
             isJumping = true;
+
+            doubleJump = !doubleJump;
         }
 
         if (_rigidbody.velocity.y < 0F)
+        {
+            isJumping = false;
             _rigidbody.mass = 4;
+        }
         else
             _rigidbody.mass = 1;
-
-        isGrounded = false;
     }
 
     private void Move()
@@ -114,7 +166,7 @@ public class Player : MonoBehaviour
         _animator.SetFloat("speed", currentAcceleration);
 
         // turning
-        if (input.magnitude != 0)
+        if (input.magnitude != 0 && dashCooldown < 0F)
         {
             lastInput = input;
 
@@ -144,8 +196,13 @@ public class Player : MonoBehaviour
     {
         if (collision.contacts[0].point.y <= transform.position.y)
         {
-            isGrounded = true;
+            //isGrounded = true;
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(transform.position + boxCastCenter, boxCastDimensions);
     }
 }
 
