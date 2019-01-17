@@ -7,4 +7,52 @@ AvatarMask:
   m_PrefabInternal: {fileID: 0}
   m_Name: Upper
   m_Mask: 00000000010000000100000000000000000000000100000001000000010000000100000000000000000000000100000001000000
-  m_Elements: []
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Armature
+    m_Weight: 1
+  - m_Path: Armature/root
+    m_Weight: 0
+  - m_Path: Armature/root/hip_L
+    m_Weight: 0
+  - m_Path: Armature/root/hip_L/leg_L
+    m_Weight: 0
+  - m_Path: Armature/root/hip_L/leg_L/foot_L
+    m_Weight: 0
+  - m_Path: Armature/root/hip_R
+    m_Weight: 0
+  - m_Path: Armature/root/hip_R/leg_R
+    m_Weight: 0
+  - m_Path: Armature/root/hip_R/leg_R/foot_R
+    m_Weight: 0
+  - m_Path: Armature/root/spine1
+    m_Weight: 1
+  - m_Path: Armature/root/spine1/spine2
+    m_Weight: 1
+  - m_Path: Armature/root/spine1/spine2/arm_L
+    m_Weight: 1
+  - m_Path: Armature/root/spine1/spine2/arm_L/elbow_L
+    m_Weight: 1
+  - m_Path: Armature/root/spine1/spine2/arm_L/elbow_L/hand_L
+    m_Weight: 1
+  - m_Path: Armature/root/spine1/spine2/arm_R
+    m_Weight: 1
+  - m_Path: Armature/root/spine1/spine2/arm_R/elbow_R
+    m_Weight: 1
+  - m_Path: Armature/root/spine1/spine2/arm_R/elbow_R/hand_R
+    m_Weight: 1
+  - m_Path: Armature/root/spine1/spine2/neck
+    m_Weight: 1
+  - m_Path: Cube
+    m_Weight: 1
+  - m_Path: Cube_001
+    m_Weight: 1
+  - m_Path: Cube_002
+    m_Weight: 1
+  - m_Path: Cube_003
+    m_Weight: 1
+  - m_Path: Cube_004
+    m_Weight: 1
+  - m_Path: Plane
+    m_Weight: 1

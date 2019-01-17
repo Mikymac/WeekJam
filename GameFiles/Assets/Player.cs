@@ -46,11 +46,12 @@ public class Player : MonoBehaviour
     private float cameraAngle;
 
     [Header("Abilities")]
+    // whether the player can jump.
+    public bool canJump;
     // whether the player can double jump.
     public bool canDoubleJump;
     // temp variable for handling double jumping.
     private bool doubleJump;
-    [Space]
     // whether the player can dash.
     public bool canDash;
     // temp variable for handling dashing.
@@ -75,6 +76,8 @@ public class Player : MonoBehaviour
 
     // whether the player is currently jumping.
     bool isJumping = false;
+    // whethe rthe player is currently falling.
+    bool isFalling = false;
 
     private void Awake()
     {
@@ -94,6 +97,11 @@ public class Player : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Z))
             _animator.SetTrigger("dab");
+
+        if (Input.GetMouseButton(0))
+            _animator.SetBool("punch", true);
+        else
+            _animator.SetBool("punch", false);
 
         Move();
         Jump();
@@ -131,9 +139,12 @@ public class Player : MonoBehaviour
 
     private void Jump()
     {
-        _animator.SetBool("isJumping", isJumping);
+        isFalling = (isJumping == false && isGrounded == false);
 
-        if (Input.GetButtonDown("Jump") && (isGrounded || (doubleJump && canDoubleJump)))
+        _animator.SetBool("isJumping", isJumping);
+        _animator.SetBool("isFalling", isFalling);
+
+        if (canJump && Input.GetButtonDown("Jump") && (isGrounded || (doubleJump && canDoubleJump)))
         {
             _rigidbody.velocity = new Vector3(_rigidbody.velocity.x, Mathf.Sqrt(2F * 9.81F * jumpHeight), _rigidbody.velocity.z);
             isJumping = true;
@@ -147,7 +158,9 @@ public class Player : MonoBehaviour
             _rigidbody.mass = 4;
         }
         else
+        {
             _rigidbody.mass = 1;
+        }
     }
 
     private void Move()
