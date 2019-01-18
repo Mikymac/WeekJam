@@ -64,6 +64,7 @@
     <Compile Include="Assets\EventSystem\Action.cs" />
     <Compile Include="Assets\EventSystem\UnlockPowerup.cs" />
     <Compile Include="Assets\Player.cs" />
+    <Compile Include="Assets\samm\SpinnyBoi.cs" />
     <Compile Include="Assets\Scripts\Crate.cs" />
     <Compile Include="Assets\Scripts\Interactable.cs" />
     <Compile Include="Assets\Scripts\jump.cs" />
